@@ -13,16 +13,22 @@ export default function FAQ({ lang, section }: FAQProps) {
 
   if (section === 'howto') {
     return (
-      <div className="w-full flex flex-col gap-6">
+      <div className="w-full flex flex-col gap-3">
         {t.howToUse.map((step, i) => (
-          <div key={i} className="flex gap-5 items-start">
+          <div
+            key={i}
+            className="flex gap-4 items-start rounded-xl px-5 py-4"
+            style={{ backgroundColor: 'rgba(255,255,255,0.7)', border: '1px solid #CCFBF1' }}
+          >
             <span
-              className="text-3xl font-black leading-none flex-shrink-0 w-10 text-right"
-              style={{ fontFamily: 'Playfair Display, serif', color: '#d8d4cc' }}
+              className="text-2xl font-black leading-none flex-shrink-0 w-9 text-right"
+              style={{ fontFamily: 'Playfair Display, serif', color: '#5EEAD4' }}
             >
               {String(i + 1).padStart(2, '0')}
             </span>
-            <p className="text-sm leading-relaxed pt-1" style={{ color: '#555' }}>{step}</p>
+            <p className="text-sm font-semibold leading-relaxed pt-0.5" style={{ color: '#134E4A' }}>
+              {step}
+            </p>
           </div>
         ))}
       </div>
@@ -30,23 +36,35 @@ export default function FAQ({ lang, section }: FAQProps) {
   }
 
   return (
-    <div className="w-full flex flex-col" style={{ borderTop: '1px solid #e0dbd4' }}>
+    <div className="w-full flex flex-col gap-2">
       {t.faq.map((item, i) => (
-        <div key={i} style={{ borderBottom: '1px solid #e0dbd4' }}>
+        <div
+          key={i}
+          className="rounded-xl overflow-hidden transition-all duration-200"
+          style={{
+            backgroundColor: openIdx === i ? 'rgba(255,255,255,0.9)' : 'rgba(255,255,255,0.6)',
+            border: `1px solid ${openIdx === i ? '#0D9488' : '#CCFBF1'}`,
+          }}
+        >
           <button
             onClick={() => setOpenIdx(openIdx === i ? null : i)}
-            className="w-full flex justify-between items-start gap-4 py-4 text-left text-sm transition-colors"
-            style={{ color: '#2a2a2a' }}
-            onMouseEnter={e => (e.currentTarget.style.color = '#000')}
-            onMouseLeave={e => (e.currentTarget.style.color = '#2a2a2a')}
+            className="w-full flex justify-between items-center gap-4 px-5 py-4 text-left cursor-pointer"
           >
-            <span>{item.q}</span>
-            <span className="flex-shrink-0 mt-0.5 text-base leading-none" style={{ color: '#aaa' }}>
+            <span className="text-sm font-bold" style={{ color: '#134E4A' }}>{item.q}</span>
+            <span
+              className="flex-shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-200"
+              style={{
+                backgroundColor: openIdx === i ? '#0D9488' : '#CCFBF1',
+                color: openIdx === i ? '#F0FDFA' : '#0D9488',
+              }}
+            >
               {openIdx === i ? '−' : '+'}
             </span>
           </button>
           {openIdx === i && (
-            <p className="pb-4 text-sm leading-relaxed" style={{ color: '#777' }}>{item.a}</p>
+            <p className="px-5 pb-4 text-sm font-medium leading-relaxed" style={{ color: '#0D9488' }}>
+              {item.a}
+            </p>
           )}
         </div>
       ))}

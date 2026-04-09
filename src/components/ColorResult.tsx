@@ -26,19 +26,21 @@ export default function ColorResult({
 
   return (
     <div className="w-full flex flex-col gap-6">
-      {/* 이미지 + 색상 블록: 모바일에서도 나란히 */}
+      {/* 이미지 + 색상 블록: 항상 나란히 */}
       <div className="flex gap-4 items-start">
-        {/* 원본 이미지 */}
-        <div className="flex-shrink-0 w-28 sm:w-48 md:w-64">
+        <div className="flex-shrink-0 w-28 sm:w-44 md:w-60">
           <img
             src={imageUrl}
             alt="uploaded"
-            className="w-full rounded-lg object-contain"
-            style={{ maxHeight: '320px' }}
+            className="w-full rounded-xl object-contain"
+            style={{
+              maxHeight: '320px',
+              boxShadow: '0 4px 16px rgba(19,78,74,0.12)',
+            }}
           />
         </div>
 
-        {/* 색상 블록: 항상 2열, 넓은 화면에서 3열 */}
+        {/* 컬러 블록: 모바일 2열, 데스크탑 3열 */}
         <div className="flex-1 grid grid-cols-2 md:grid-cols-3 gap-2">
           {colors.map((color, i) => (
             <ColorBlock key={color.hex + i} color={color} index={i} lang={lang} />
@@ -47,19 +49,25 @@ export default function ColorResult({
       </div>
 
       {/* 색상 수 조절 + 리셋 */}
-      <div className="flex items-center justify-between gap-4 flex-wrap">
+      <div
+        className="flex items-center justify-between gap-4 flex-wrap rounded-xl px-4 py-3"
+        style={{ backgroundColor: 'rgba(255,255,255,0.6)', border: '1px solid #CCFBF1' }}
+      >
         <div className="flex items-center gap-3">
-          <span className="text-xs uppercase tracking-widest" style={{ color: '#aaa8a2' }}>{t.colorCount}</span>
+          <span className="text-xs font-bold uppercase tracking-widest" style={{ color: '#0D9488' }}>
+            {t.colorCount}
+          </span>
           <div className="flex gap-2">
             {COLOR_OPTIONS.map(n => (
               <button
                 key={n}
                 onClick={() => onColorCountChange(n)}
-                className="w-9 h-9 rounded text-sm font-bold transition-colors duration-150"
+                className="w-9 h-9 rounded-lg text-sm font-bold cursor-pointer transition-all duration-150"
                 style={{
-                  backgroundColor: colorCount === n ? '#1a1a1a' : 'transparent',
-                  color: colorCount === n ? '#f5f2ec' : '#999',
-                  border: `1px solid ${colorCount === n ? '#1a1a1a' : '#c8c4bc'}`,
+                  backgroundColor: colorCount === n ? '#0D9488' : 'transparent',
+                  color: colorCount === n ? '#F0FDFA' : '#0D9488',
+                  border: `2px solid ${colorCount === n ? '#0D9488' : '#5EEAD4'}`,
+                  transform: colorCount === n ? 'scale(1.05)' : 'scale(1)',
                 }}
               >
                 {n}
@@ -70,10 +78,18 @@ export default function ColorResult({
 
         <button
           onClick={onReset}
-          className="text-xs uppercase tracking-widest px-4 py-2 rounded transition-colors duration-150"
-          style={{ color: '#aaa8a2', border: '1px solid #c8c4bc' }}
-          onMouseEnter={e => { e.currentTarget.style.color = '#555'; e.currentTarget.style.borderColor = '#888'; }}
-          onMouseLeave={e => { e.currentTarget.style.color = '#aaa8a2'; e.currentTarget.style.borderColor = '#c8c4bc'; }}
+          className="text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-lg cursor-pointer transition-all duration-150"
+          style={{ color: '#0D9488', border: '2px solid #5EEAD4', backgroundColor: 'transparent' }}
+          onMouseEnter={e => {
+            e.currentTarget.style.backgroundColor = '#0D9488';
+            e.currentTarget.style.color = '#F0FDFA';
+            e.currentTarget.style.borderColor = '#0D9488';
+          }}
+          onMouseLeave={e => {
+            e.currentTarget.style.backgroundColor = 'transparent';
+            e.currentTarget.style.color = '#0D9488';
+            e.currentTarget.style.borderColor = '#5EEAD4';
+          }}
         >
           {t.reset}
         </button>

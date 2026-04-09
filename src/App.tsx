@@ -10,6 +10,21 @@ import FAQ from './components/FAQ';
 
 type Tab = 'analyze' | 'howto' | 'faq';
 
+// 디자인 시스템 토큰
+const DS = {
+  headerBg: '#134E4A',
+  headerText: '#F0FDFA',
+  headerMuted: '#5EEAD4',
+  tabActiveBg: '#F0FDFA',
+  tabActiveText: '#134E4A',
+  tabInactiveText: '#99F6E4',
+  bodyBg: '#F0FDFA',
+  bodyText: '#134E4A',
+  primary: '#0D9488',
+  footerBg: '#0F3A37',
+  footerText: '#2DD4BF',
+};
+
 export default function App() {
   const [lang] = useState<Lang>(detectLang);
   const [colors, setColors] = useState<ColorData[] | null>(null);
@@ -92,41 +107,52 @@ export default function App() {
   ];
 
   return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#f5f2ec' }}>
-      {/* 다크 헤더 영역 */}
-      <div style={{ backgroundColor: '#0f0f0f' }}>
-        {/* 상단 광고 */}
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: DS.bodyBg, fontFamily: 'Nunito, sans-serif' }}>
+      {/* 다크 teal 헤더 */}
+      <div style={{ backgroundColor: DS.headerBg }}>
         <div className="flex justify-center pt-3">
           <AdSlot variant="top" />
         </div>
 
-        {/* 헤더 */}
-        <header className="flex flex-col items-center pt-7 pb-5 px-4">
-          <button onClick={handleTitleClick} className="group focus:outline-none">
+        <header className="flex flex-col items-center pt-6 pb-4 px-4">
+          <button
+            onClick={handleTitleClick}
+            className="group focus:outline-none cursor-pointer"
+          >
             <h1
-              className="text-4xl sm:text-5xl font-black tracking-tight group-hover:opacity-60 transition-opacity"
-              style={{ fontFamily: 'Playfair Display, serif', letterSpacing: '-0.02em', color: '#f0ede8' }}
+              className="text-4xl sm:text-5xl font-black tracking-tight transition-opacity duration-150 group-hover:opacity-70"
+              style={{
+                fontFamily: 'Playfair Display, serif',
+                letterSpacing: '-0.02em',
+                color: DS.headerText,
+              }}
             >
               ColorScouter
             </h1>
           </button>
-          <p className="text-xs tracking-widest uppercase mt-2" style={{ color: '#4a4a4a' }}>
+          <p
+            className="text-xs tracking-widest uppercase mt-2 font-semibold"
+            style={{ color: DS.headerMuted }}
+          >
             {t.subtitle}
           </p>
         </header>
 
         {/* 탭 바 */}
         <div className="flex justify-center px-4 pb-5">
-          <nav className="flex gap-1 p-1 rounded-lg" style={{ backgroundColor: '#1c1c1c' }}>
+          <nav
+            className="flex gap-1 p-1 rounded-xl"
+            style={{ backgroundColor: 'rgba(0,0,0,0.25)' }}
+          >
             {tabs.map(({ key, label }) => (
               <button
                 key={key}
                 onClick={() => setActiveTab(key)}
-                className="px-5 py-2 text-xs rounded-md transition-all duration-150 tracking-widest uppercase"
+                className="px-5 py-2 text-xs rounded-lg font-bold tracking-widest uppercase cursor-pointer transition-all duration-200"
                 style={{
-                  backgroundColor: activeTab === key ? '#f5f2ec' : 'transparent',
-                  color: activeTab === key ? '#0f0f0f' : '#555',
-                  fontWeight: activeTab === key ? 700 : 400,
+                  backgroundColor: activeTab === key ? DS.tabActiveBg : 'transparent',
+                  color: activeTab === key ? DS.tabActiveText : DS.tabInactiveText,
+                  transform: activeTab === key ? 'scale(1)' : 'scale(0.97)',
                 }}
               >
                 {label}
@@ -140,7 +166,6 @@ export default function App() {
       <main className="flex-1 flex justify-center px-4 py-10">
         <div className="w-full max-w-3xl">
 
-          {/* 분석 탭 */}
           {activeTab === 'analyze' && (
             <div className="flex flex-col gap-6">
               {!colors && !analyzing && (
@@ -150,10 +175,15 @@ export default function App() {
               {analyzing && (
                 <div className="flex flex-col items-center gap-4 py-20">
                   <div
-                    className="w-8 h-8 rounded-full border-2 animate-spin"
-                    style={{ borderColor: '#d0ccc6', borderTopColor: '#555' }}
+                    className="w-9 h-9 rounded-full border-[3px] animate-spin"
+                    style={{ borderColor: '#CCFBF1', borderTopColor: DS.primary }}
                   />
-                  <p className="text-xs tracking-widest uppercase" style={{ color: '#999' }}>{t.analyzing}</p>
+                  <p
+                    className="text-xs font-bold tracking-widest uppercase"
+                    style={{ color: DS.primary }}
+                  >
+                    {t.analyzing}
+                  </p>
                 </div>
               )}
 
@@ -170,35 +200,31 @@ export default function App() {
             </div>
           )}
 
-          {/* 사용법 탭 */}
           {activeTab === 'howto' && (
-            <div className="py-2">
-              <FAQ lang={lang} section="howto" />
-            </div>
+            <FAQ lang={lang} section="howto" />
           )}
 
-          {/* FAQ 탭 */}
           {activeTab === 'faq' && (
-            <div className="py-2">
-              <FAQ lang={lang} section="faq" />
-            </div>
+            <FAQ lang={lang} section="faq" />
           )}
 
         </div>
       </main>
 
-      {/* 다크 푸터 */}
       <footer
-        className="text-center py-5 text-xs border-t"
-        style={{ backgroundColor: '#0f0f0f', color: '#333', borderColor: '#1c1c1c' }}
+        className="text-center py-5 text-xs font-semibold tracking-widest uppercase border-t"
+        style={{ backgroundColor: DS.footerBg, color: DS.footerText, borderColor: '#0D3B38' }}
       >
         ColorScouter — client-side only · no upload
       </footer>
 
       <style>{`
         @keyframes fadeSlideIn {
-          from { opacity: 0; transform: translateY(10px); }
+          from { opacity: 0; transform: translateY(8px); }
           to   { opacity: 1; transform: translateY(0); }
+        }
+        @media (prefers-reduced-motion: reduce) {
+          * { animation-duration: 0.01ms !important; transition-duration: 0.01ms !important; }
         }
       `}</style>
     </div>
