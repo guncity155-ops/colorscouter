@@ -120,7 +120,7 @@ export default function App() {
             className="group focus:outline-none cursor-pointer flex items-baseline gap-3"
           >
             <h1
-              className="text-xl font-black tracking-tight transition-opacity duration-150 group-hover:opacity-70"
+              className="text-2xl font-black tracking-tight transition-opacity duration-150 group-hover:opacity-70"
               style={{ fontFamily: 'Playfair Display, serif', color: DS.headerText }}
             >
               ColorScouter
