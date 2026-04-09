@@ -51,10 +51,10 @@ export default function ColorResult({
       {/* 색상 수 조절 + 리셋 */}
       <div
         className="flex items-center justify-between gap-4 flex-wrap rounded-xl px-4 py-3"
-        style={{ backgroundColor: 'rgba(255,255,255,0.6)', border: '1px solid #CCFBF1' }}
+        style={{ backgroundColor: 'rgba(255,255,255,0.7)', border: '1px solid #e5e5e5' }}
       >
         <div className="flex items-center gap-3">
-          <span className="text-xs font-bold uppercase tracking-widest" style={{ color: '#0D9488' }}>
+          <span className="text-xs font-bold uppercase tracking-widest" style={{ color: '#999' }}>
             {t.colorCount}
           </span>
           <div className="flex gap-2">
@@ -64,9 +64,9 @@ export default function ColorResult({
                 onClick={() => onColorCountChange(n)}
                 className="w-9 h-9 rounded-lg text-sm font-bold cursor-pointer transition-all duration-150"
                 style={{
-                  backgroundColor: colorCount === n ? '#0D9488' : 'transparent',
-                  color: colorCount === n ? '#F0FDFA' : '#0D9488',
-                  border: `2px solid ${colorCount === n ? '#0D9488' : '#5EEAD4'}`,
+                  backgroundColor: colorCount === n ? '#111' : 'transparent',
+                  color: colorCount === n ? '#f5f5f5' : '#555',
+                  border: `2px solid ${colorCount === n ? '#111' : '#ddd'}`,
                   transform: colorCount === n ? 'scale(1.05)' : 'scale(1)',
                 }}
               >
@@ -79,16 +79,16 @@ export default function ColorResult({
         <button
           onClick={onReset}
           className="text-xs font-bold uppercase tracking-widest px-4 py-2 rounded-lg cursor-pointer transition-all duration-150"
-          style={{ color: '#0D9488', border: '2px solid #5EEAD4', backgroundColor: 'transparent' }}
+          style={{ color: '#555', border: '2px solid #ddd', backgroundColor: 'transparent' }}
           onMouseEnter={e => {
-            e.currentTarget.style.backgroundColor = '#0D9488';
-            e.currentTarget.style.color = '#F0FDFA';
-            e.currentTarget.style.borderColor = '#0D9488';
+            e.currentTarget.style.backgroundColor = '#111';
+            e.currentTarget.style.color = '#f5f5f5';
+            e.currentTarget.style.borderColor = '#111';
           }}
           onMouseLeave={e => {
             e.currentTarget.style.backgroundColor = 'transparent';
-            e.currentTarget.style.color = '#0D9488';
-            e.currentTarget.style.borderColor = '#5EEAD4';
+            e.currentTarget.style.color = '#555';
+            e.currentTarget.style.borderColor = '#ddd';
           }}
         >
           {t.reset}

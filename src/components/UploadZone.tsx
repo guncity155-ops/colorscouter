@@ -41,19 +41,17 @@ export default function UploadZone({ onFile, lang }: UploadZoneProps) {
       onDrop={onDrop}
       className="cursor-pointer rounded-2xl flex flex-col items-center justify-center gap-4 py-16 px-8 transition-all duration-200"
       style={{
-        border: `2px dashed ${dragging ? '#0D9488' : '#5EEAD4'}`,
-        backgroundColor: dragging ? 'rgba(13,148,136,0.06)' : 'rgba(255,255,255,0.7)',
+        border: `2px dashed ${dragging ? '#555' : '#ccc'}`,
+        backgroundColor: dragging ? 'rgba(0,0,0,0.03)' : 'rgba(255,255,255,0.8)',
         transform: dragging ? 'scale(1.01)' : 'scale(1)',
-        boxShadow: dragging
-          ? '0 0 0 4px rgba(13,148,136,0.1)'
-          : '0 1px 3px rgba(19,78,74,0.06)',
+        boxShadow: dragging ? '0 0 0 4px rgba(0,0,0,0.06)' : '0 1px 3px rgba(0,0,0,0.06)',
       }}
     >
       <div
         className="w-14 h-14 rounded-full flex items-center justify-center transition-colors duration-200"
-        style={{ backgroundColor: dragging ? 'rgba(13,148,136,0.12)' : 'rgba(94,234,212,0.2)' }}
+        style={{ backgroundColor: dragging ? 'rgba(0,0,0,0.08)' : 'rgba(0,0,0,0.05)' }}
       >
-        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#0D9488" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#555" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
           <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4" />
           <polyline points="17 8 12 3 7 8" />
           <line x1="12" y1="3" x2="12" y2="15" />
@@ -61,10 +59,10 @@ export default function UploadZone({ onFile, lang }: UploadZoneProps) {
       </div>
 
       <div className="text-center">
-        <p className="text-base font-bold" style={{ color: '#134E4A' }}>
+        <p className="text-base font-bold" style={{ color: '#111' }}>
           {t.uploadPrompt}
         </p>
-        <p className="text-xs font-semibold mt-1" style={{ color: '#0D9488' }}>
+        <p className="text-xs font-semibold mt-1" style={{ color: '#999' }}>
           {t.uploadHint}
         </p>
       </div>

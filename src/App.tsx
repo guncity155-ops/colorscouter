@@ -12,17 +12,17 @@ type Tab = 'analyze' | 'howto' | 'faq';
 
 // 디자인 시스템 토큰
 const DS = {
-  headerBg: '#134E4A',
-  headerText: '#F0FDFA',
-  headerMuted: '#5EEAD4',
-  tabActiveBg: '#F0FDFA',
-  tabActiveText: '#134E4A',
-  tabInactiveText: '#99F6E4',
-  bodyBg: '#F0FDFA',
-  bodyText: '#134E4A',
-  primary: '#0D9488',
-  footerBg: '#0F3A37',
-  footerText: '#2DD4BF',
+  headerBg: '#111111',
+  headerText: '#f5f5f5',
+  headerMuted: '#777777',
+  tabActiveBg: '#f5f5f5',
+  tabActiveText: '#111111',
+  tabInactiveText: '#888888',
+  bodyBg: '#f7f7f7',
+  bodyText: '#111111',
+  primary: '#333333',
+  footerBg: '#111111',
+  footerText: '#555555',
 };
 
 export default function App() {
