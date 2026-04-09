@@ -108,51 +108,41 @@ export default function App() {
 
   return (
     <div className="min-h-screen flex flex-col" style={{ backgroundColor: DS.bodyBg, fontFamily: 'Nunito, sans-serif' }}>
-      {/* 다크 teal 헤더 */}
+      {/* 슬림 네비바 */}
       <div style={{ backgroundColor: DS.headerBg }}>
-        <div className="flex justify-center pt-3">
+        <div className="flex justify-center pt-2">
           <AdSlot variant="top" />
         </div>
-
-        <header className="flex flex-col items-center pt-6 pb-4 px-4">
+        <div className="flex items-center justify-between px-5 py-3 max-w-3xl mx-auto w-full">
+          {/* 타이틀 */}
           <button
             onClick={handleTitleClick}
-            className="group focus:outline-none cursor-pointer"
+            className="group focus:outline-none cursor-pointer flex items-baseline gap-3"
           >
             <h1
-              className="text-4xl sm:text-5xl font-black tracking-tight transition-opacity duration-150 group-hover:opacity-70"
-              style={{
-                fontFamily: 'Playfair Display, serif',
-                letterSpacing: '-0.02em',
-                color: DS.headerText,
-              }}
+              className="text-xl font-black tracking-tight transition-opacity duration-150 group-hover:opacity-70"
+              style={{ fontFamily: 'Playfair Display, serif', color: DS.headerText }}
             >
               ColorScouter
             </h1>
+            <span className="hidden sm:block text-xs font-semibold tracking-widest uppercase" style={{ color: DS.headerMuted }}>
+              {t.subtitle}
+            </span>
           </button>
-          <p
-            className="text-xs tracking-widest uppercase mt-2 font-semibold"
-            style={{ color: DS.headerMuted }}
-          >
-            {t.subtitle}
-          </p>
-        </header>
 
-        {/* 탭 바 */}
-        <div className="flex justify-center px-4 pb-5">
+          {/* 탭 */}
           <nav
-            className="flex gap-1 p-1 rounded-xl"
+            className="flex gap-1 p-1 rounded-lg"
             style={{ backgroundColor: 'rgba(0,0,0,0.25)' }}
           >
             {tabs.map(({ key, label }) => (
               <button
                 key={key}
                 onClick={() => setActiveTab(key)}
-                className="px-5 py-2 text-xs rounded-lg font-bold tracking-widest uppercase cursor-pointer transition-all duration-200"
+                className="px-4 py-1.5 text-xs rounded-md font-bold tracking-widest uppercase cursor-pointer transition-all duration-200"
                 style={{
                   backgroundColor: activeTab === key ? DS.tabActiveBg : 'transparent',
                   color: activeTab === key ? DS.tabActiveText : DS.tabInactiveText,
-                  transform: activeTab === key ? 'scale(1)' : 'scale(0.97)',
                 }}
               >
                 {label}
