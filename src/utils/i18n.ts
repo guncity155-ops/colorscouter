@@ -1,5 +1,6 @@
 export const messages = {
   ko: {
+    tabAnalyze: '분석',
     subtitle: '이미지 속 색의 비중을 분석합니다',
     uploadPrompt: '이미지를 드래그하거나 클릭해서 업로드',
     uploadHint: 'JPG, PNG, WebP, GIF · 최대 10MB · Ctrl+V 붙여넣기 가능',
@@ -37,6 +38,7 @@ export const messages = {
     ],
   },
   en: {
+    tabAnalyze: 'Analyze',
     subtitle: 'Analyze the color composition of any image',
     uploadPrompt: 'Drag & drop or click to upload',
     uploadHint: 'JPG, PNG, WebP, GIF · Max 10MB · Paste with Ctrl+V',

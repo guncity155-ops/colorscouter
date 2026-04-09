@@ -8,6 +8,8 @@ import ColorResult from './components/ColorResult';
 import AdSlot from './components/AdSlot';
 import FAQ from './components/FAQ';
 
+type Tab = 'analyze' | 'howto' | 'faq';
+
 export default function App() {
   const [lang] = useState<Lang>(detectLang);
   const [colors, setColors] = useState<ColorData[] | null>(null);
@@ -15,6 +17,7 @@ export default function App() {
   const [analyzing, setAnalyzing] = useState(false);
   const [colorCount, setColorCount] = useState(5);
   const [currentBlob, setCurrentBlob] = useState<Blob | null>(null);
+  const [activeTab, setActiveTab] = useState<Tab>('analyze');
 
   const t = messages[lang];
 
@@ -40,6 +43,7 @@ export default function App() {
 
   async function handleFile(file: File) {
     setCurrentBlob(file);
+    setActiveTab('analyze');
     await runAnalysis(file, colorCount);
   }
 
@@ -56,7 +60,11 @@ export default function App() {
     setImageUrl(null);
   }
 
-  // 붙여넣기 (Ctrl+V / ⌘+V)
+  function handleTitleClick() {
+    handleReset();
+    setActiveTab('analyze');
+  }
+
   useEffect(() => {
     async function onPaste(e: ClipboardEvent) {
       const items = e.clipboardData?.items;
@@ -67,6 +75,7 @@ export default function App() {
           if (!blob) continue;
           e.preventDefault();
           setCurrentBlob(blob);
+          setActiveTab('analyze');
           await runAnalysis(blob, colorCount);
           return;
         }
@@ -76,81 +85,119 @@ export default function App() {
     return () => window.removeEventListener('paste', onPaste);
   }, [colorCount, runAnalysis]);
 
-  return (
-    <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#0a0a0a', color: '#f5f5f5' }}>
-      {/* 상단 광고 */}
-      <div className="flex justify-center pt-4">
-        <AdSlot variant="top" />
-      </div>
+  const tabs: { key: Tab; label: string }[] = [
+    { key: 'analyze', label: t.tabAnalyze },
+    { key: 'howto', label: t.howToUseTitle },
+    { key: 'faq', label: t.faqTitle },
+  ];
 
-      {/* 메인 레이아웃: 좌 광고 + 콘텐츠 + 우 광고 */}
-      <div className="flex justify-center gap-6 flex-1 px-4 py-8">
-        {/* 좌 광고 */}
-        <div className="hidden xl:flex items-start pt-8">
-          <AdSlot variant="left" />
+  return (
+    <div className="min-h-screen flex flex-col" style={{ backgroundColor: '#f5f2ec' }}>
+      {/* 다크 헤더 영역 */}
+      <div style={{ backgroundColor: '#0f0f0f' }}>
+        {/* 상단 광고 */}
+        <div className="flex justify-center pt-3">
+          <AdSlot variant="top" />
         </div>
 
-        {/* 콘텐츠 */}
-        <main className="flex flex-col items-center w-full max-w-3xl gap-8">
-          {/* 헤더 */}
-          <header className="text-center">
+        {/* 헤더 */}
+        <header className="flex flex-col items-center pt-7 pb-5 px-4">
+          <button onClick={handleTitleClick} className="group focus:outline-none">
             <h1
-              className="text-5xl font-black tracking-tight mb-2"
-              style={{ fontFamily: 'Playfair Display, serif', letterSpacing: '-0.02em' }}
+              className="text-4xl sm:text-5xl font-black tracking-tight group-hover:opacity-60 transition-opacity"
+              style={{ fontFamily: 'Playfair Display, serif', letterSpacing: '-0.02em', color: '#f0ede8' }}
             >
               ColorScouter
             </h1>
-            <p className="text-sm text-gray-500 tracking-widest uppercase">
-              {t.subtitle}
-            </p>
-          </header>
+          </button>
+          <p className="text-xs tracking-widest uppercase mt-2" style={{ color: '#4a4a4a' }}>
+            {t.subtitle}
+          </p>
+        </header>
 
-          {/* 업로드 or 결과 */}
-          {!colors && !analyzing && (
-            <div className="w-full">
-              <UploadZone onFile={handleFile} lang={lang} />
-            </div>
-          )}
-
-          {analyzing && (
-            <div className="flex flex-col items-center gap-4 py-16">
-              <div
-                className="w-10 h-10 rounded-full border-2 animate-spin"
-                style={{ borderColor: '#333', borderTopColor: '#aaa' }}
-              />
-              <p className="text-sm text-gray-500 tracking-widest uppercase">{t.analyzing}</p>
-            </div>
-          )}
-
-          {colors && imageUrl && !analyzing && (
-            <ColorResult
-              colors={colors}
-              imageUrl={imageUrl}
-              colorCount={colorCount}
-              onColorCountChange={handleColorCountChange}
-              onReset={handleReset}
-              lang={lang}
-            />
-          )}
-
-          {/* FAQ / 사용설명 */}
-          <FAQ lang={lang} />
-        </main>
-
-        {/* 우 광고 */}
-        <div className="hidden xl:flex items-start pt-8">
-          <AdSlot variant="right" />
+        {/* 탭 바 */}
+        <div className="flex justify-center px-4 pb-5">
+          <nav className="flex gap-1 p-1 rounded-lg" style={{ backgroundColor: '#1c1c1c' }}>
+            {tabs.map(({ key, label }) => (
+              <button
+                key={key}
+                onClick={() => setActiveTab(key)}
+                className="px-5 py-2 text-xs rounded-md transition-all duration-150 tracking-widest uppercase"
+                style={{
+                  backgroundColor: activeTab === key ? '#f5f2ec' : 'transparent',
+                  color: activeTab === key ? '#0f0f0f' : '#555',
+                  fontWeight: activeTab === key ? 700 : 400,
+                }}
+              >
+                {label}
+              </button>
+            ))}
+          </nav>
         </div>
       </div>
 
-      {/* 푸터 */}
-      <footer className="text-center py-6 text-xs text-gray-700 border-t border-gray-900">
+      {/* 본문 */}
+      <main className="flex-1 flex justify-center px-4 py-10">
+        <div className="w-full max-w-3xl">
+
+          {/* 분석 탭 */}
+          {activeTab === 'analyze' && (
+            <div className="flex flex-col gap-6">
+              {!colors && !analyzing && (
+                <UploadZone onFile={handleFile} lang={lang} />
+              )}
+
+              {analyzing && (
+                <div className="flex flex-col items-center gap-4 py-20">
+                  <div
+                    className="w-8 h-8 rounded-full border-2 animate-spin"
+                    style={{ borderColor: '#d0ccc6', borderTopColor: '#555' }}
+                  />
+                  <p className="text-xs tracking-widest uppercase" style={{ color: '#999' }}>{t.analyzing}</p>
+                </div>
+              )}
+
+              {colors && imageUrl && !analyzing && (
+                <ColorResult
+                  colors={colors}
+                  imageUrl={imageUrl}
+                  colorCount={colorCount}
+                  onColorCountChange={handleColorCountChange}
+                  onReset={handleReset}
+                  lang={lang}
+                />
+              )}
+            </div>
+          )}
+
+          {/* 사용법 탭 */}
+          {activeTab === 'howto' && (
+            <div className="py-2">
+              <FAQ lang={lang} section="howto" />
+            </div>
+          )}
+
+          {/* FAQ 탭 */}
+          {activeTab === 'faq' && (
+            <div className="py-2">
+              <FAQ lang={lang} section="faq" />
+            </div>
+          )}
+
+        </div>
+      </main>
+
+      {/* 다크 푸터 */}
+      <footer
+        className="text-center py-5 text-xs border-t"
+        style={{ backgroundColor: '#0f0f0f', color: '#333', borderColor: '#1c1c1c' }}
+      >
         ColorScouter — client-side only · no upload
       </footer>
 
       <style>{`
         @keyframes fadeSlideIn {
-          from { opacity: 0; transform: translateY(12px); }
+          from { opacity: 0; transform: translateY(10px); }
           to   { opacity: 1; transform: translateY(0); }
         }
       `}</style>
