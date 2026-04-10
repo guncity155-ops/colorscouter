@@ -58,6 +58,42 @@ function closestIdx(pixel: [number, number, number], centers: [number, number, n
   return idx;
 }
 
+// Farthest Point Sampling: 기존 센터에서 가장 먼 픽셀을 새 씨앗으로 추가
+// → 노랑 클러스터 안 피부톤처럼 "다른 색"이 자연스럽게 분리됨
+function padToCount(
+  centers: [number, number, number][],
+  pixels: [number, number, number][],
+  target: number,
+): [number, number, number][] {
+  if (centers.length >= target) return centers;
+
+  // 속도를 위해 픽셀 샘플링 (최대 4000개)
+  const step = Math.max(1, Math.floor(pixels.length / 4000));
+  const sample = pixels.filter((_, i) => i % step === 0);
+
+  while (centers.length < target) {
+    // 현재 센터들과의 최소 거리가 가장 큰 픽셀 탐색
+    let maxDist = -1;
+    let farthest = sample[0];
+    for (const p of sample) {
+      let minDist = Infinity;
+      for (const c of centers) {
+        const d = (p[0]-c[0])**2 + (p[1]-c[1])**2 + (p[2]-c[2])**2;
+        if (d < minDist) minDist = d;
+      }
+      if (minDist > maxDist) { maxDist = minDist; farthest = p; }
+    }
+    if (maxDist < 400) break; // RGB 거리 20 미만이면 더 다른 색 없음
+
+    centers.push(farthest);
+  }
+
+  // 1회 k-means 정제: 씨앗 픽셀 → 실제 군집 centroid
+  const groups: [number, number, number][][] = centers.map(() => []);
+  for (const p of pixels) groups[closestIdx(p, centers)].push(p);
+  return centers.map((c, i) => groups[i].length > 0 ? satWeightedCentroid(groups[i]) : c);
+}
+
 // ── Phase 1: 색조 히스토그램 NMS 피크 감지 ────────────────────
 
 function findKeyColorCenters(
@@ -99,7 +135,6 @@ function findKeyColorCenters(
 
     selectedBins.push(s.bin);
 
-    // 주변 빈 억제
     for (let d = -NMS_RADIUS; d <= NMS_RADIUS; d++) {
       suppressed.add((s.bin + d + HUE_BINS) % HUE_BINS);
     }
@@ -144,20 +179,32 @@ export async function analyzeImage(source: File | Blob, colorCount: number): Pro
   // vivid 키 컬러 추출 (최대 colorCount-1개)
   const vividCenters = findKeyColorCenters(pixels, colorCount - 1);
 
-  // 중립색을 어두운/밝은 두 그룹으로 분리 → 검정과 흰색이 회색 하나로 뭉치지 않도록
   const neutralPixels = pixels.filter(p => getSaturation(p[0], p[1], p[2]) < SAT_THRESHOLD);
-  const darkNeutrals  = neutralPixels.filter(p => (p[0] + p[1] + p[2]) / 3 < 100);   // 어두운 중립
-  const lightNeutrals = neutralPixels.filter(p => (p[0] + p[1] + p[2]) / 3 >= 100);  // 밝은 중립
+  const darkNeutrals  = neutralPixels.filter(p => (p[0] + p[1] + p[2]) / 3 < 100);
+  const lightNeutrals = neutralPixels.filter(p => (p[0] + p[1] + p[2]) / 3 >= 100);
   const centers: [number, number, number][] = [...vividCenters];
   const MIN_NEUTRAL = pixels.length * 0.02;
-  if (darkNeutrals.length  > MIN_NEUTRAL) centers.push(centroidOf(darkNeutrals));
+
+  // 어두운 중립색: 색조 60° 단위 6버킷으로 세분화 → 올리브/다크블루 등 뭉침 방지
+  const darkBuckets: [number, number, number][][] = Array.from({ length: 6 }, () => []);
+  for (const p of darkNeutrals) {
+    const bin = getHueBin(p[0], p[1], p[2]);
+    darkBuckets[bin < 0 ? 0 : Math.floor(bin / (HUE_BINS / 6))].push(p);
+  }
+  for (const bucket of darkBuckets) {
+    if (bucket.length > MIN_NEUTRAL) centers.push(centroidOf(bucket));
+  }
+
   if (lightNeutrals.length > MIN_NEUTRAL) centers.push(centroidOf(lightNeutrals));
 
   if (centers.length === 0) return [];
 
+  // 색수 보장: colorCount보다 부족하면 가장 큰 클러스터 분할로 채움
+  const filledCenters = padToCount(centers, pixels, colorCount);
+
   // 모든 픽셀을 가장 가까운 센터에 배분
-  const k = Math.min(centers.length, colorCount);
-  const usedCenters = centers.slice(0, k);
+  const k = Math.min(filledCenters.length, colorCount);
+  const usedCenters = filledCenters.slice(0, k);
   const counts = new Array<number>(k).fill(0);
   for (const p of pixels) counts[closestIdx(p, usedCenters)]++;
   const total = pixels.length;
