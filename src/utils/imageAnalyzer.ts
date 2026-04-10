@@ -77,12 +77,12 @@ function findKeyColorCenters(
     bins[bin].satSum += sat;
   }
 
-  // 2) 각 버킷 점수: 픽셀 수 × 평균 채도
-  const scores = bins.map((b, i) => ({
-    bin: i,
-    score: b.pixels.length === 0 ? 0 : b.pixels.length * (b.satSum / b.pixels.length),
-    pixelCount: b.pixels.length,
-  }));
+  // 2) 각 버킷 점수: 픽셀 수 × 평균 채도² → 소면적 고채도 색(노랑 드레스 등)이 대면적 저채도 색에 묻히지 않게
+  const scores = bins.map((b, i) => {
+    if (b.pixels.length === 0) return { bin: i, score: 0, pixelCount: 0 };
+    const avgSat = b.satSum / b.pixels.length;
+    return { bin: i, score: b.pixels.length * avgSat * avgSat, pixelCount: b.pixels.length };
+  });
 
   // 3) NMS: 점수 내림차순으로 순회하며 이미 선택된 피크 ±NMS_RADIUS 안이면 skip
   const totalVivid = scores.reduce((sum, b) => sum + b.pixelCount, 0);
