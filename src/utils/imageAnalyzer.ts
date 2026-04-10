@@ -4,7 +4,7 @@ import type { ColorData } from '../types';
 const MAX_SIZE = 200;
 const SAT_THRESHOLD = 0.20;  // 낮춰서 탁한 초록/노랑도 포함
 const HUE_BINS = 36;          // 10° 단위 → 노랑(50°) 픽셀이 여러 빈에 흩어지지 않고 뭉침
-const NMS_RADIUS = 2;           // 선택된 피크 주변 ±2빈(±20°) 억제
+const NMS_RADIUS = 3;           // 선택된 피크 주변 ±3빈(±30°) 억제 — 유사 노랑 두 피크 병합
 const CENTROID_RADIUS = 2;      // 피크 centroid 계산 범위 ±2빈(±20°)
 const MIN_PEAK_RATIO = 0.015;   // 전체 vivid 픽셀의 최소 1.5% 이상이어야 피크로 인정
 
@@ -144,18 +144,14 @@ export async function analyzeImage(source: File | Blob, colorCount: number): Pro
   // vivid 키 컬러 추출 (최대 colorCount-1개)
   const vividCenters = findKeyColorCenters(pixels, colorCount - 1);
 
-  // 중립 색 대표 1개: 채도 낮은 픽셀의 centroid
+  // 중립색을 어두운/밝은 두 그룹으로 분리 → 검정과 흰색이 회색 하나로 뭉치지 않도록
   const neutralPixels = pixels.filter(p => getSaturation(p[0], p[1], p[2]) < SAT_THRESHOLD);
+  const darkNeutrals  = neutralPixels.filter(p => (p[0] + p[1] + p[2]) / 3 < 100);   // 어두운 중립
+  const lightNeutrals = neutralPixels.filter(p => (p[0] + p[1] + p[2]) / 3 >= 100);  // 밝은 중립
   const centers: [number, number, number][] = [...vividCenters];
-  if (neutralPixels.length > pixels.length * 0.03) {
-    centers.push(centroidOf(neutralPixels));
-  }
-
-  // 그래도 부족하면 나머지 neutral에서 추가 분할
-  while (centers.length < colorCount && neutralPixels.length > centers.length * 2) {
-    const step = Math.floor(neutralPixels.length / (centers.length + 1));
-    centers.push(neutralPixels[step * centers.length]);
-  }
+  const MIN_NEUTRAL = pixels.length * 0.02;
+  if (darkNeutrals.length  > MIN_NEUTRAL) centers.push(centroidOf(darkNeutrals));
+  if (lightNeutrals.length > MIN_NEUTRAL) centers.push(centroidOf(lightNeutrals));
 
   if (centers.length === 0) return [];
 
