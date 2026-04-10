@@ -105,6 +105,10 @@ function findKeyColorCenters(
     }
   }
 
+  // DEBUG
+  console.log('[ColorScouter] selected hue bins (×5°):', selectedBins.map(b => `bin${b}(${Math.round(b*5)}°)`));
+  console.log('[ColorScouter] top10 scores:', [...scores].sort((a,b)=>b.score-a.score).slice(0,10).map(s=>`bin${s.bin}(${Math.round(s.bin*5)}°) px=${s.pixelCount} score=${s.score.toFixed(1)}`));
+
   // 4) 각 피크의 대표색: ±CENTROID_RADIUS 범위 픽셀의 centroid
   return selectedBins.map(bin => {
     const pool: [number, number, number][] = [];
