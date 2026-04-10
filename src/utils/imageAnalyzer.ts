@@ -4,7 +4,7 @@ import type { ColorData } from '../types';
 const MAX_SIZE = 200;
 const SAT_THRESHOLD = 0.20;  // 낮춰서 탁한 초록/노랑도 포함
 const HUE_BINS = 72;          // 5° 단위 → 노랑(55°)과 갈색(30°)을 분리 가능
-const NMS_RADIUS = 4;           // 선택된 피크 주변 ±4빈(±20°) 억제
+const NMS_RADIUS = 2;           // 선택된 피크 주변 ±2빈(±10°) 억제 — 4이면 피부톤이 노랑(60°)까지 억제
 const CENTROID_RADIUS = 3;      // 피크 centroid 계산 범위 ±3빈(±15°)
 const MIN_PEAK_RATIO = 0.015;   // 전체 vivid 픽셀의 최소 1.5% 이상이어야 피크로 인정
 
