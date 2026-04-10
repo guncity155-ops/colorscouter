@@ -49,17 +49,21 @@ export function hslToRgb(h: number, s: number, l: number): [number, number, numb
   ];
 }
 
-// 명도만 보정 — 채도는 satWeightedCentroid가 이미 자연스럽게 결정했으므로 건드리지 않음
-// 너무 어둡거나 밝은 색만 살짝 당겨 스와치에서 읽기 좋게
+// 명도 + 채도 보정
+// 채도: RGB 평균 과정에서 하이라이트/그림자 픽셀이 섞여 탁해지는 현상 보정 (×1.2, 최대 1.0)
+// 명도: 너무 어둡거나 밝은 색만 살짝 당겨 스와치에서 읽기 좋게
 export function refineColor(r: number, g: number, b: number): [number, number, number] {
   const { h, s, l } = rgbToHsl(r, g, b);
 
   if (s < 0.10) return [r, g, b]; // 중립색은 그대로
 
-  const targetL = l < 0.20 ? l + (0.30 - l) * 0.5   // 너무 어두우면 조금 밝게
-                : l > 0.82 ? l - (l - 0.72) * 0.5   // 너무 밝으면 조금 어둡게
-                : l;                                   // 그 외엔 유지
+  // 채도 보정: 클러스터 평균으로 탁해진 만큼 복원 (이미 채도 높으면 cap)
+  const targetS = Math.min(1.0, s * 1.2);
 
-  if (Math.abs(targetL - l) < 0.01) return [r, g, b];
-  return hslToRgb(h, s, targetL);
+  const targetL = l < 0.20 ? l + (0.30 - l) * 0.5
+                : l > 0.82 ? l - (l - 0.72) * 0.5
+                : l;
+
+  if (Math.abs(targetS - s) < 0.02 && Math.abs(targetL - l) < 0.01) return [r, g, b];
+  return hslToRgb(h, targetS, targetL);
 }
